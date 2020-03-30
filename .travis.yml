@@ -19,6 +19,9 @@ matrix:
         - cargo fmt --version || rustup component add rustfmt
         - cargo clippy --version || rustup component add clippy
     - os: linux
+      install:
+        - cargo fmt --version || travis_retry rustup component add rustfmt
+        - cargo clippy --version || travis_retry rustup component add clippy
 
 script:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cargo fmt -- --check; fi
