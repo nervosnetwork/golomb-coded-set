@@ -3,8 +3,13 @@ name = "golomb-coded-set"
 version = "0.1.0"
 authors = ["Linfeng Qian <thewawar@gmail.com>"]
 edition = "2018"
+license = "MIT"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "An implementation of BIP158 Golomb-Coded Set data structure"
+readme = "README.md"
+repository = "https://github.com/TheWaWaR/golomb-coded-set"
+keywords = ["golomb", "set", "bip158"]
+categories = ["algorithms", "data-structures"]
 
 [dependencies]
 bitcoin_hashes = "0.7.3"
