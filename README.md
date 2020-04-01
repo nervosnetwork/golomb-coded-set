@@ -8,7 +8,7 @@ NOTE: The code is mainly copy from [rust-bitcoin](https://github.com/rust-bitcoi
 
 ```
 cd golomb-loss
-cargo run
+cargo run --release
 ```
 
 The output:
@@ -25,38 +25,38 @@ The output:
 ========
 
  # P=10, M=    1533, false-positive-rate=0.0006522867
-N=10    , bits/item=11.7262, bits/item(real)=18.4000, build-filter-cost=91.296µs
-N=100   , bits/item=11.9784, bits/item(real)=12.7200, build-filter-cost=482.491µs
-N=1000  , bits/item=12.0186, bits/item(real)=12.1280, build-filter-cost=4.775904ms
-N=10000 , bits/item=12.0241, bits/item(real)=12.0632, build-filter-cost=42.614618ms
-N=100000, bits/item=12.0248, bits/item(real)=12.0539, build-filter-cost=416.904422ms
+N=10    , bits/item=11.7262, bits/item(real)=18.4000, build-filter-cost=6.926µs
+N=100   , bits/item=11.9784, bits/item(real)=12.7200, build-filter-cost=24.154µs
+N=1000  , bits/item=12.0186, bits/item(real)=12.1120, build-filter-cost=246.224µs
+N=10000 , bits/item=12.0241, bits/item(real)=12.0600, build-filter-cost=2.978371ms
+N=100000, bits/item=12.0248, bits/item(real)=12.0539, build-filter-cost=35.731131ms
 
  # P=15, M=   49058, false-positive-rate=0.0000203840
-N=10    , bits/item=16.7262, bits/item(real)=24.0000, build-filter-cost=84.812µs
-N=100   , bits/item=16.9784, bits/item(real)=17.7600, build-filter-cost=5.866147ms
-N=1000  , bits/item=17.0186, bits/item(real)=17.1280, build-filter-cost=4.513592ms
-N=10000 , bits/item=17.0241, bits/item(real)=17.0632, build-filter-cost=42.698718ms
-N=100000, bits/item=17.0248, bits/item(real)=17.0536, build-filter-cost=418.770731ms
+N=10    , bits/item=16.7262, bits/item(real)=23.2000, build-filter-cost=6.117µs
+N=100   , bits/item=16.9784, bits/item(real)=17.7600, build-filter-cost=4.960362ms
+N=1000  , bits/item=17.0186, bits/item(real)=17.1120, build-filter-cost=302.957µs
+N=10000 , bits/item=17.0241, bits/item(real)=17.0600, build-filter-cost=2.626318ms
+N=100000, bits/item=17.0248, bits/item(real)=17.0537, build-filter-cost=34.169061ms
 
  # P=19, M=  784931, false-positive-rate=0.0000012740
-N=10    , bits/item=20.7262, bits/item(real)=28.0000, build-filter-cost=70.931µs
-N=100   , bits/item=20.9784, bits/item(real)=21.7600, build-filter-cost=450.961µs
-N=1000  , bits/item=21.0186, bits/item(real)=21.1280, build-filter-cost=4.64919ms
-N=10000 , bits/item=21.0241, bits/item(real)=21.0632, build-filter-cost=43.084025ms
-N=100000, bits/item=21.0248, bits/item(real)=21.0536, build-filter-cost=427.381864ms
+N=10    , bits/item=20.7262, bits/item(real)=27.2000, build-filter-cost=6.692µs
+N=100   , bits/item=20.9784, bits/item(real)=21.7600, build-filter-cost=43.907µs
+N=1000  , bits/item=21.0186, bits/item(real)=21.1120, build-filter-cost=310.448µs
+N=10000 , bits/item=21.0241, bits/item(real)=21.0600, build-filter-cost=2.696983ms
+N=100000, bits/item=21.0248, bits/item(real)=21.0537, build-filter-cost=34.340566ms
 
  # P=20, M= 1569862, false-positive-rate=0.0000006370
-N=10    , bits/item=21.7262, bits/item(real)=28.8000, build-filter-cost=89.917µs
-N=100   , bits/item=21.9784, bits/item(real)=22.7200, build-filter-cost=448.59µs
-N=1000  , bits/item=22.0186, bits/item(real)=22.1280, build-filter-cost=4.671141ms
-N=10000 , bits/item=22.0241, bits/item(real)=22.0632, build-filter-cost=43.219213ms
-N=100000, bits/item=22.0248, bits/item(real)=22.0536, build-filter-cost=424.415087ms
+N=10    , bits/item=21.7262, bits/item(real)=28.8000, build-filter-cost=6.392µs
+N=100   , bits/item=21.9784, bits/item(real)=22.7200, build-filter-cost=44.985µs
+N=1000  , bits/item=22.0186, bits/item(real)=22.1120, build-filter-cost=322.643µs
+N=10000 , bits/item=22.0241, bits/item(real)=22.0600, build-filter-cost=2.801545ms
+N=100000, bits/item=22.0248, bits/item(real)=22.0537, build-filter-cost=32.687121ms
 
  # P=25, M=50235582, false-positive-rate=0.0000000199
-N=10    , bits/item=26.7262, bits/item(real)=33.6000, build-filter-cost=88.958µs
-N=100   , bits/item=26.9784, bits/item(real)=27.7600, build-filter-cost=452.27µs
-N=1000  , bits/item=27.0186, bits/item(real)=27.1280, build-filter-cost=4.766385ms
-N=10000 , bits/item=27.0241, bits/item(real)=27.0632, build-filter-cost=43.95553ms
-N=100000, bits/item=27.0248, bits/item(real)=27.0536, build-filter-cost=432.00147ms
+N=10    , bits/item=26.7262, bits/item(real)=33.6000, build-filter-cost=6.894µs
+N=100   , bits/item=26.9784, bits/item(real)=27.7600, build-filter-cost=46.113µs
+N=1000  , bits/item=27.0186, bits/item(real)=27.1120, build-filter-cost=327.462µs
+N=10000 , bits/item=27.0241, bits/item(real)=27.0600, build-filter-cost=2.868482ms
+N=100000, bits/item=27.0248, bits/item(real)=27.0537, build-filter-cost=35.875129ms
 ```
 
