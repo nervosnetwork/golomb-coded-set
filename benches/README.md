@@ -1,4 +1,11 @@
 
+## Bench Environment
+```
+Memory : 15.6 GiB
+   CPU : Intel® Xeon(R) CPU E5-2670 0 @ 2.60GHz × 32 
+    OS : Ubuntu 20.04.4 LTS (64-bit)
+```
+
 ## The Report
 
 * `blake2b_sip24` means `blake2b` hash the data then feed the hash as data to `GCSFilterWriter`
