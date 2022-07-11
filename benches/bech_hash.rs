@@ -27,7 +27,7 @@ fn sip24(scripts: &[Vec<u8>]) {
         .expect("flush to memory writer should be OK");
 }
 
-fn gcs_blake2b_sip24(c: &mut Criterion) {
+fn gcs_bench(c: &mut Criterion) {
     let scripts = (0..SCRIPT_COUNT)
         .map(|count| count as u8)
         .map(|start| (start..start + SCRIPT_SIZE as u8).collect::<Vec<_>>())
@@ -46,17 +46,5 @@ fn gcs_blake2b_sip24(c: &mut Criterion) {
     group.finish();
 }
 
-fn gcs_sip24(c: &mut Criterion) {
-    let scripts = (0..SCRIPT_COUNT)
-        .map(|count| count as u8)
-        .map(|start| (start..start + SCRIPT_SIZE as u8).collect::<Vec<_>>())
-        .collect::<Vec<_>>();
-    for count in 1..=SCRIPT_COUNT {
-        c.bench_function(format!("sip24-{}", count).as_str(), |b| {
-            b.iter(|| sip24(&scripts[0..count]))
-        });
-    }
-}
-
-criterion_group!(benches, gcs_blake2b_sip24);
+criterion_group!(benches, gcs_bench);
 criterion_main!(benches);
