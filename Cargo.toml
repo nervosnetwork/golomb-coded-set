@@ -14,5 +14,12 @@ categories = ["algorithms", "data-structures"]
 [dependencies]
 bitcoin_hashes = "0.7.3"
 
+
 [dev-dependencies]
 hex = "=0.3.2"
+criterion = "0.3"
+ckb-hash = "0.103.0"
+
+[[bench]]
+name = "bech_hash"
+harness = false
