@@ -69,7 +69,7 @@ impl GCSFilterReader {
             .map(|e| map_to_range(self.filter.hash(e), nm))
             .collect::<Vec<_>>();
         // sort
-        mapped.sort();
+        mapped.sort_unstable();
         if mapped.is_empty() {
             return Ok(true);
         }
@@ -126,7 +126,7 @@ impl GCSFilterReader {
             .map(|e| map_to_range(self.filter.hash(e), nm))
             .collect::<Vec<_>>();
         // sort
-        mapped.sort();
+        mapped.sort_unstable();
         mapped.dedup();
         if mapped.is_empty() {
             return Ok(true);
@@ -210,7 +210,7 @@ impl<'a> GCSFilterWriter<'a> {
             .iter()
             .map(|e| map_to_range(self.filter.hash(e.as_slice()), nm))
             .collect();
-        mapped.sort();
+        mapped.sort_unstable();
 
         // NOTE: bitcoin use VarInt here
         // write number of elements as varint
@@ -403,10 +403,10 @@ mod test {
         let bytes = out.into_inner();
 
         {
-            let mut query = Vec::new();
-            query.push(hex::decode("abcdef").unwrap());
-            query.push(hex::decode("eeeeee").unwrap());
-
+            let query = vec![
+                hex::decode("abcdef").unwrap(),
+                hex::decode("eeeeee").unwrap(),
+            ];
             let reader = GCSFilterReader::new(0, 0, M, P);
             let mut input = Cursor::new(bytes.clone());
             assert!(reader
@@ -414,10 +414,10 @@ mod test {
                 .unwrap());
         }
         {
-            let mut query = Vec::new();
-            query.push(hex::decode("abcdef").unwrap());
-            query.push(hex::decode("123456").unwrap());
-
+            let query = vec![
+                hex::decode("abcdef").unwrap(),
+                hex::decode("123456").unwrap(),
+            ];
             let reader = GCSFilterReader::new(0, 0, M, P);
             let mut input = Cursor::new(bytes.clone());
             assert!(!reader
