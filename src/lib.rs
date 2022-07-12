@@ -223,9 +223,11 @@ impl<'a, H: ToU64Hasher> GCSFilterWriter<'a, H> {
 }
 
 pub trait ToU64Hasher {
+    /// Hash the data to u64 integer
     fn hash_to_u64(&self, element: &[u8]) -> u64;
 }
 
+/// The default sip24 hash function
 pub struct Sip24Hasher {
     k0: u64, // sip hash key
     k1: u64, // sip hash key
