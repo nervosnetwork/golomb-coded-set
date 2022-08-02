@@ -24,25 +24,45 @@
 
 use std::cmp::Ordering;
 use std::collections::HashSet;
+use std::hash::{BuildHasher, Hasher};
 use std::{cmp, io};
 
-use bitcoin_hashes::siphash24;
+use siphasher::sip::SipHasher24;
 
 /// Golomb encoding parameter as in BIP-158, see also https://gist.github.com/sipa/576d5f09c3b86c3b1b75598d799fc845
 pub const P: u8 = 19;
 pub const M: u64 = 784_931;
 
+/// The default hasher builder build a SipHash 2-4 Hasher
+pub struct SipHasher24Builder {
+    k0: u64,
+    k1: u64,
+}
+
+impl SipHasher24Builder {
+    pub fn new(k0: u64, k1: u64) -> SipHasher24Builder {
+        SipHasher24Builder { k0, k1 }
+    }
+}
+
+impl BuildHasher for SipHasher24Builder {
+    type Hasher = SipHasher24;
+    fn build_hasher(&self) -> Self::Hasher {
+        SipHasher24::new_with_keys(self.k0, self.k1)
+    }
+}
+
 /// Golomb-Rice encoded filter reader
-pub struct GCSFilterReader {
-    filter: GCSFilter,
+pub struct GCSFilterReader<H> {
+    filter: GCSFilter<H>,
     m: u64,
 }
 
-impl GCSFilterReader {
+impl<H: BuildHasher> GCSFilterReader<H> {
     /// Create a new filter reader with specific seed to siphash
-    pub fn new(k0: u64, k1: u64, m: u64, p: u8) -> GCSFilterReader {
+    pub fn new(hasher_builder: H, m: u64, p: u8) -> GCSFilterReader<H> {
         GCSFilterReader {
-            filter: GCSFilter::new(k0, k1, p),
+            filter: GCSFilter::new(hasher_builder, p),
             m,
         }
     }
@@ -169,24 +189,23 @@ fn map_to_range(hash: u64, nm: u64) -> u64 {
 }
 
 /// Colomb-Rice encoded filter writer
-pub struct GCSFilterWriter<'a> {
-    filter: GCSFilter,
+pub struct GCSFilterWriter<'a, H> {
+    filter: GCSFilter<H>,
     writer: &'a mut dyn io::Write,
     elements: HashSet<Vec<u8>>,
     m: u64,
 }
 
-impl<'a> GCSFilterWriter<'a> {
+impl<'a, H: BuildHasher> GCSFilterWriter<'a, H> {
     /// Create a new GCS writer wrapping a generic writer, with specific seed to siphash
     pub fn new(
         writer: &'a mut dyn io::Write,
-        k0: u64,
-        k1: u64,
+        hasher_builder: H,
         m: u64,
         p: u8,
-    ) -> GCSFilterWriter<'a> {
+    ) -> GCSFilterWriter<'a, H> {
         GCSFilterWriter {
-            filter: GCSFilter::new(k0, k1, p),
+            filter: GCSFilter::new(hasher_builder, p),
             writer,
             elements: HashSet::new(),
             m,
@@ -229,16 +248,15 @@ impl<'a> GCSFilterWriter<'a> {
 }
 
 /// Golomb Coded Set Filter
-struct GCSFilter {
-    k0: u64, // sip hash key
-    k1: u64, // sip hash key
+struct GCSFilter<H> {
+    hasher_builder: H,
     p: u8,
 }
 
-impl GCSFilter {
+impl<H: BuildHasher> GCSFilter<H> {
     /// Create a new filter
-    fn new(k0: u64, k1: u64, p: u8) -> GCSFilter {
-        GCSFilter { k0, k1, p }
+    fn new(hasher_builder: H, p: u8) -> GCSFilter<H> {
+        GCSFilter { hasher_builder, p }
     }
 
     /// Golomb-Rice encode a number n to a bit stream (Parameter 2^k)
@@ -267,7 +285,9 @@ impl GCSFilter {
 
     /// Hash an arbitrary slice with siphash using parameters of this filter
     fn hash(&self, element: &[u8]) -> u64 {
-        siphash24::Hash::hash_to_u64_with_keys(self.k0, self.k1, element)
+        let mut hasher = self.hasher_builder.build_hasher();
+        hasher.write(element);
+        hasher.finish()
     }
 }
 
@@ -393,7 +413,7 @@ mod test {
 
         let mut out = Cursor::new(Vec::new());
         {
-            let mut writer = GCSFilterWriter::new(&mut out, 0, 0, M, P);
+            let mut writer = GCSFilterWriter::new(&mut out, SipHasher24Builder::new(0, 0), M, P);
             for p in &patterns {
                 writer.add_element(p.as_slice());
             }
@@ -407,7 +427,7 @@ mod test {
                 hex::decode("abcdef").unwrap(),
                 hex::decode("eeeeee").unwrap(),
             ];
-            let reader = GCSFilterReader::new(0, 0, M, P);
+            let reader = GCSFilterReader::new(SipHasher24Builder::new(0, 0), M, P);
             let mut input = Cursor::new(bytes.clone());
             assert!(reader
                 .match_any(&mut input, &mut query.iter().map(|v| v.as_slice()))
@@ -418,14 +438,14 @@ mod test {
                 hex::decode("abcdef").unwrap(),
                 hex::decode("123456").unwrap(),
             ];
-            let reader = GCSFilterReader::new(0, 0, M, P);
+            let reader = GCSFilterReader::new(SipHasher24Builder::new(0, 0), M, P);
             let mut input = Cursor::new(bytes.clone());
             assert!(!reader
                 .match_any(&mut input, &mut query.iter().map(|v| v.as_slice()))
                 .unwrap());
         }
         {
-            let reader = GCSFilterReader::new(0, 0, M, P);
+            let reader = GCSFilterReader::new(SipHasher24Builder::new(0, 0), M, P);
             let mut query = Vec::new();
             for p in &patterns {
                 query.push(p.clone());
@@ -436,7 +456,7 @@ mod test {
                 .unwrap());
         }
         {
-            let reader = GCSFilterReader::new(0, 0, M, P);
+            let reader = GCSFilterReader::new(SipHasher24Builder::new(0, 0), M, P);
             let mut query = Vec::new();
             for p in &patterns {
                 query.push(p.clone());
