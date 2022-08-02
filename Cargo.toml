@@ -12,8 +12,7 @@ keywords = ["golomb", "set", "bip158"]
 categories = ["algorithms", "data-structures"]
 
 [dependencies]
-bitcoin_hashes = "0.7.3"
-
+siphasher = "0.3"
 
 [dev-dependencies]
 hex = "=0.3.2"
