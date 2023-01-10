@@ -67,7 +67,8 @@ impl<H: BuildHasher> GCSFilterReader<H> {
         }
     }
 
-    /// match any query pattern
+    /// Match any query pattern, returns true if any of the query pattern is matched, otherwise returns false.
+    /// An empty query iterator returns false.
     pub fn match_any(
         &self,
         reader: &mut dyn io::Read,
@@ -91,7 +92,7 @@ impl<H: BuildHasher> GCSFilterReader<H> {
         // sort
         mapped.sort_unstable();
         if mapped.is_empty() {
-            return Ok(true);
+            return Ok(false);
         }
         if n_elements == 0 {
             return Ok(false);
@@ -124,7 +125,8 @@ impl<H: BuildHasher> GCSFilterReader<H> {
         Ok(false)
     }
 
-    /// match all query pattern
+    /// Match all query pattern, returns true if all of the query pattern is matched, otherwise returns false.
+    /// An empty query iterator returns false.
     pub fn match_all(
         &self,
         reader: &mut dyn io::Read,
@@ -149,7 +151,7 @@ impl<H: BuildHasher> GCSFilterReader<H> {
         mapped.sort_unstable();
         mapped.dedup();
         if mapped.is_empty() {
-            return Ok(true);
+            return Ok(false);
         }
         if n_elements == 0 {
             return Ok(false);
@@ -462,7 +464,25 @@ mod test {
                 query.push(p.clone());
             }
             query.push(hex::decode("abcdef").unwrap());
+            let mut input = Cursor::new(bytes.clone());
+            assert!(!reader
+                .match_all(&mut input, &mut query.iter().map(|v| v.as_slice()))
+                .unwrap());
+        }
+        {
+            // test empty query match_any
+            let reader = GCSFilterReader::new(SipHasher24Builder::new(0, 0), M, P);
+            let mut input = Cursor::new(bytes.clone());
+            let query: Vec<Vec<u8>> = Vec::new();
+            assert!(!reader
+                .match_any(&mut input, &mut query.iter().map(|v| v.as_slice()))
+                .unwrap());
+        }
+        {
+            // test empty query match_all
+            let reader = GCSFilterReader::new(SipHasher24Builder::new(0, 0), M, P);
             let mut input = Cursor::new(bytes);
+            let query: Vec<Vec<u8>> = Vec::new();
             assert!(!reader
                 .match_all(&mut input, &mut query.iter().map(|v| v.as_slice()))
                 .unwrap());
